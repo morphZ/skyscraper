@@ -1,0 +1,12 @@
+#!/usr/bin/ruby -w
+
+def scrape_kayak
+  puts "Hello Sky!"
+  IO.popen("./phantomjs test.js") { |f| puts f.gets }
+end
+
+
+1.upto(5) do |i|
+  puts "#{i}. Infinity, the start that would not die"
+end
+
