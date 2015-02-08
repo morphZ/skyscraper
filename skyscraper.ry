@@ -1,4 +1,5 @@
 #!/usr/bin/ruby -w
+# Scrape the flight search web site Kayak for specific flights, save them to a sqlite db and mail the results to a specific mail adress
 
 def scrape_kayak
   puts "Hello Sky!"
