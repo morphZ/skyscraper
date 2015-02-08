@@ -46,7 +46,6 @@ class Pricedata
   end
 end
 
-
 jobs = [
   "http://www.kayak.de/flights/DUS-FUE/2015-07-20/2015-08-01",
   "http://www.kayak.de/flights/FRA-FUE/2015-07-20/2015-08-01",
