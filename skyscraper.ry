@@ -40,8 +40,9 @@ class Pricedata
   def save_to_sqlite
     db = SQLite3::Database.new @@DB_PATH
     param_str = "?"+",?"*(@data[0].keys.length-1)
+    query_str = "INSERT INTO pricedata (#{@data[0].keys.join(',')}) VALUES (#{param_str})"
     @data.each do |d|
-      db.execute "INSERT INTO pricedata (#{param_str}) VALUES (#{param_str})", [d.keys, d.values]
+      db.execute query_str, d.values
     end
   end
 end
@@ -53,4 +54,4 @@ jobs = [
 ]
 
 dataset = Pricedata.new jobs[0]
-# dataset.save_to_sqlite
+dataset.save_to_sqlite
