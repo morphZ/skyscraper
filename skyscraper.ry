@@ -23,7 +23,7 @@ class Skyscraper
       f[:return_date] = url.split('/')[6]
       f[:price] = f[:price].to_i.to_s
     end
-    
+
     flights
   end
 
@@ -32,18 +32,23 @@ class Skyscraper
       p = Price.create f      
     end
   end
+
+  def self.scrape_n_save (url)
+    f = self.scrape url
+    self.save_to_db f
+  end
 end
 
-jobs = [
-  "http://www.kayak.de/flights/DUS-FUE/2015-07-20/2015-08-01/NONSTOP",
-  "http://www.kayak.de/flights/FRA-FUE/2015-07-20/2015-08-01/NONSTOP",
-  "http://www.kayak.de/flights/CGN-FUE/2015-07-20/2015-08-01/NONSTOP"
+origins = [
+  "DUS",
+  "CGN",
+  "FRA"
 ]
 
-f = Skyscraper.scrape jobs[0]
-Skyscraper.save_to_db f
-
-Price.all.each do |o|
-  puts "o: #{o.inspect}"
+puts "Start scraping ..."
+origins.each do |o|
+  url = "http://www.kayak.de/flights/#{o}-FUE/2015-07-20/2015-08-01/NONSTOP"
+  print "Scraping #{url}... "
+  Skyscraper.scrape_n_save url
+  puts "Done."
 end
-
