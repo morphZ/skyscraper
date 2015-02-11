@@ -43,8 +43,7 @@ jobs = [
 ]
 
 f = Skyscraper.scrape jobs[0]
-#Skyscraper.save_to_db f
-puts f
+Skyscraper.save_to_db f
 
 Price.all.each do |o|
   puts "o: #{o.inspect}"
