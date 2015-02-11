@@ -17,12 +17,10 @@ end
 class Skyscraper 
   def self.scrape(url)
     flights = JSON.parse `./phantomjs scrape-kayak.js "#{url}"`, :symbolize_names => true
-    time = Time.now
     flights.each do |f|
       f[:scraped_url] = url
       f[:outbound_date] = url.split('/')[5]
       f[:return_date] = url.split('/')[6]
-      f[:offer_time] = time.to_s
       f[:price] = f[:price].to_i.to_s
     end
     
