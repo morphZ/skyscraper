@@ -1,4 +1,6 @@
 var system = require('system');
+var fs = require('fs');
+var outfile = 'flights.json.tmp';
 var args = system.args;
 var url = args.length > 1 ? args[1]:"http://www.kayak.de/flights/DUS-FUE/2015-07-20/2015-08-01/NONSTOP";
 
@@ -33,7 +35,8 @@ page.open(url, function(status) {
         return objRes;
       });
 
-      console.log(JSON.stringify(strResultsPJS));
+      fs.write(outfile, JSON.stringify(strResultsPJS), 'w');
+      //console.log(JSON.stringify(strResultsPJS));
       phantom.exit();
     });
   }
