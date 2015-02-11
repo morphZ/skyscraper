@@ -6,6 +6,8 @@ require 'sqlite3'
 require 'pry'
 require 'active_record'
 
+$FLIGHT_DATA_FILE = 'flights.json.tmp'
+
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
   database: 'skyscraper.db'
@@ -16,7 +18,17 @@ end
 
 class Skyscraper 
   def self.scrape(url)
-    flights = JSON.parse `./phantomjs scrape-kayak.js "#{url}"`, :symbolize_names => true
+    # start headless browser phantomjs with url
+    # output ist written to file $FLIGHT_DATA_FILE
+    `./phantomjs scrape-kayak.js "#{url}"`
+
+    # parse flight data from json file
+    flights = JSON.parse File.read($FLIGHT_DATA_FILE), :symbolize_names => true
+
+    # delete temp file
+    File.delete($FLIGHT_DATA_FILE);
+
+    # customize some data
     flights.each do |f|
       f[:scraped_url] = url
       f[:outbound_date] = url.split('/')[5]
