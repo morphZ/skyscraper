@@ -35,9 +35,9 @@ class Skyscraper
 end
 
 jobs = [
-  "http://www.kayak.de/flights/DUS-FUE/2015-07-20/2015-08-01",
-  "http://www.kayak.de/flights/FRA-FUE/2015-07-20/2015-08-01",
-  "http://www.kayak.de/flights/CGN-FUE/2015-07-20/2015-08-01"
+  "http://www.kayak.de/flights/DUS-FUE/2015-07-20/2015-08-01/NONSTOP",
+  "http://www.kayak.de/flights/FRA-FUE/2015-07-20/2015-08-01/NONSTOP",
+  "http://www.kayak.de/flights/CGN-FUE/2015-07-20/2015-08-01/NONSTOP"
 ]
 
 f = Skyscraper.scrape jobs[0]
@@ -47,5 +47,3 @@ Price.all.each do |o|
   puts "o: #{o.inspect}"
 end
 
-#dataset = Pricedata.new jobs[0]
-#dataset.save_to_sqlite
