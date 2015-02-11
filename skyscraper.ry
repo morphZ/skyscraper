@@ -4,45 +4,34 @@
 require 'json'
 require 'sqlite3'
 require 'pry'
+require 'active_record'
 
-class Pricedata
-  @@DATA_KEYS = [
-    :origin,
-    :destination,
-    :price,
-    :airline,
-    :outbound_date,
-    :outbound_dep_time,
-    :outbound_arr_time,
-    :outbound_stops,
-    :return_date,
-    :return_dep_time,
-    :return_arr_time,
-    :return_stops,
-    :scraped_url,
-    :offer_time
-  ]
+ActiveRecord::Base.establish_connection(
+  adapter:  'sqlite3',
+  database: 'skyscraper.db'
+)
 
-  @@DB_PATH = "pricedata"
+class Price < ActiveRecord::Base
+end
 
-  def initialize(url)
-    @data = JSON.parse `./phantomjs scrape-kayak.js "#{url}"`, :symbolize_names => true
+class Skyscraper 
+  def self.scrape(url)
+    flights = JSON.parse `./phantomjs scrape-kayak.js "#{url}"`, :symbolize_names => true
     time = Time.now
-    @data.each do |d|
-      d[:scraped_url] = url
-      d[:outbound_date] = url.split('/')[5]
-      d[:return_date] = url.split('/')[6]
-      d[:offer_time] = time.to_s
-      d[:price] = d[:price].to_i.to_s
+    flights.each do |f|
+      f[:scraped_url] = url
+      f[:outbound_date] = url.split('/')[5]
+      f[:return_date] = url.split('/')[6]
+      f[:offer_time] = time.to_s
+      f[:price] = f[:price].to_i.to_s
     end
+    
+    flights
   end
 
-  def save_to_sqlite
-    db = SQLite3::Database.new @@DB_PATH
-    param_str = "?"+",?"*(@data[0].keys.length-1)
-    query_str = "INSERT INTO pricedata (#{@data[0].keys.join(',')}) VALUES (#{param_str})"
-    @data.each do |d|
-      db.execute query_str, d.values
+  def self.save_to_db (flights)
+    flights.each do |f|
+      p = Price.create f      
     end
   end
 end
@@ -53,5 +42,13 @@ jobs = [
   "http://www.kayak.de/flights/CGN-FUE/2015-07-20/2015-08-01"
 ]
 
-dataset = Pricedata.new jobs[0]
-dataset.save_to_sqlite
+f = Skyscraper.scrape jobs[0]
+#Skyscraper.save_to_db f
+puts f
+
+Price.all.each do |o|
+  puts "o: #{o.inspect}"
+end
+
+#dataset = Pricedata.new jobs[0]
+#dataset.save_to_sqlite
