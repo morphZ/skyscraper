@@ -5,6 +5,7 @@ require 'json'
 require 'sqlite3'
 require 'pry'
 require 'active_record'
+require 'mail'
 
 $FLIGHT_DATA_FILE = 'flights.json.tmp'
 
@@ -51,6 +52,27 @@ class Skyscraper
   end
 end
 
+class FlightSummary
+  def self.mail_summary(email)
+    mail = Mail.deliver do
+      delivery_method :sendmail
+
+      to      "#{email}" 
+      from    'Fluguebersicht <123morph@gmail.com>'
+      subject 'First multipart email sent with Mail'
+
+      text_part do
+        body 'This is plain text'
+      end
+
+      html_part do
+        content_type 'text/html; charset=UTF-8'
+        body '<h1>This is HTML</h1>'
+      end
+    end
+  end
+end
+
 origins = [
   "DUS",
   "CGN",
@@ -64,3 +86,5 @@ origins.each do |o|
   Skyscraper.scrape_n_save url
   puts "Done."
 end
+
+FlightSummary.mail_summary 'franz.kirchhoff@googlemail.com'
