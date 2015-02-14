@@ -21,12 +21,15 @@ class Skyscraper
   def initialize(origins)
     @origins = origins
     @flights = Hash.new
+    @last_scraped = Price.maximum(:scraped_at)
   end
 
   def scrape_origins
-    @scraping_date = Time.now
-    @origins.each do |o|
-      scrape o
+    if Time.now - @last_scraped > 18 * 60 * 60
+      @scraping_date = Time.now
+      @origins.each {|o| scrape o }
+    else
+      puts "Retrieving last scraping results from database."
     end
   end
 
