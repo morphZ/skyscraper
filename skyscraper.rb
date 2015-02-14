@@ -18,7 +18,23 @@ class Price < ActiveRecord::Base
 end
 
 class Skyscraper 
-  def self.scrape(url)
+  def initialize(origins)
+    @origins = origins
+    @flights = Hash.new
+  end
+
+  def scrape_origins
+    @origins.each do |o|
+      scrape o
+    end
+  end
+
+  private
+
+  def scrape(origin)
+    url = "http://www.kayak.de/flights/#{origin}-FUE/2015-07-20/2015-08-01/NONSTOP"
+    print "Scraping #{url}... "
+
     # start headless browser phantomjs with url
     # output ist written to file $FLIGHT_DATA_FILE
     `./phantomjs scrape-kayak.js "#{url}"`
@@ -35,21 +51,17 @@ class Skyscraper
       f[:outbound_date] = url.split('/')[5]
       f[:return_date] = url.split('/')[6]
       f[:price] = f[:price].to_i.to_s
+
+      # add flight to db
+      Price.create f
     end
 
-    flights
+    puts "Done."
+
+    @flights[origin] = flights
+    binding.pry
   end
 
-  def self.save_to_db (flights)
-    flights.each do |f|
-      p = Price.create f      
-    end
-  end
-
-  def self.scrape_n_save (url)
-    f = self.scrape url
-    self.save_to_db f
-  end
 end
 
 class FlightSummary
@@ -71,20 +83,13 @@ class FlightSummary
       end
     end
   end
+
+  def self.make_table
+    puts "Results of last scraping"
+  end
 end
 
-origins = [
-  "DUS",
-  "CGN",
-  "FRA"
-]
+s = Skyscraper.new [:DUS, :CGN, :FRA]
+s.scrape_origins
 
-puts "Start scraping ..."
-origins.each do |o|
-  url = "http://www.kayak.de/flights/#{o}-FUE/2015-07-20/2015-08-01/NONSTOP"
-  print "Scraping #{url}... "
-  Skyscraper.scrape_n_save url
-  puts "Done."
-end
-
-FlightSummary.mail_summary 'franz.kirchhoff@googlemail.com'
+# FlightSummary.mail_summary 'franz.kirchhoff@googlemail.com'
