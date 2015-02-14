@@ -24,6 +24,7 @@ class Skyscraper
   end
 
   def scrape_origins
+    @scraping_date = Time.now
     @origins.each do |o|
       scrape o
     end
@@ -47,10 +48,12 @@ class Skyscraper
 
     # customize some data
     flights.each do |f|
+      f[:scraped_at] = @scraping_date
       f[:scraped_url] = url
       f[:outbound_date] = url.split('/')[5]
       f[:return_date] = url.split('/')[6]
       f[:price] = f[:price].to_i.to_s
+
 
       # add flight to db
       Price.create f
@@ -59,7 +62,6 @@ class Skyscraper
     puts "Done."
 
     @flights[origin] = flights
-    binding.pry
   end
 
 end
