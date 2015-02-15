@@ -6,8 +6,10 @@ require 'sqlite3'
 require 'pry'
 require 'active_record'
 require 'mail'
+require 'erb'
 
 $FLIGHT_DATA_FILE = 'flights.json.tmp'
+$SUMMARY_TEMPLATE_FILE ='summary.erb.html'
 
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
@@ -31,6 +33,10 @@ class Skyscraper
     else
       puts "Retrieving last scraping results from database."
     end
+  end
+
+  def print_html_summary
+    puts ERB.new(File.read($SUMMARY_TEMPLATE_FILE), nil, '>').result(binding)
   end
 
   private
@@ -95,6 +101,6 @@ class FlightSummary
 end
 
 s = Skyscraper.new [:DUS, :CGN, :FRA]
-s.scrape_origins
+binding.pry
+# s.scrape_origins
 
-# FlightSummary.mail_summary 'franz.kirchhoff@googlemail.com'

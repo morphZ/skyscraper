@@ -1,0 +1,14 @@
+<table>
+  <th>
+    <td></td>
+    <% @origins.each do |o| %>
+    <td><%= o %></td>
+    <% end %>
+  </th>
+  <tr>
+    <td>Aktueller Preis</td>
+    <% @origins.each do |o| %>
+    <td><%= Price.where(origin: o, scraped_at: @last_scraped).minimum(:price) %></td>
+    <% end %>
+  </tr>
+</table>
