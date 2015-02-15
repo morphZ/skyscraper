@@ -19,6 +19,21 @@ ActiveRecord::Base.establish_connection(
 )
 
 class Price < ActiveRecord::Base
+  def to_s
+    format "%s € | %s->%s %s->%s (%s) | %s->%s %s->%s (%s) | %s",
+      price,
+      origin,
+      destination,
+      outbound_dep_time.strftime('%R'),
+      outbound_arr_time.strftime('%R'),
+      outbound_stops,
+      destination,
+      origin,
+      return_dep_time.strftime('%R'),
+      return_arr_time.strftime('%R'),
+      return_stops,
+      airline
+  end
 end
 
 class Skyscraper 
