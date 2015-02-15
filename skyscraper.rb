@@ -1,4 +1,6 @@
 #!/usr/bin/ruby
+# encoding: utf-8
+
 # Scrape the flight search web site Kayak for specific flights, save them to a sqlite db and mail the results to a specific mail adress
 
 require 'json'
@@ -22,26 +24,53 @@ end
 class Skyscraper 
   def initialize(origins)
     @origins = origins
-    @flights = Hash.new
+    @summary = Hash.new
     @last_scraped = Price.maximum(:scraped_at)
+
+    create_summary
+    scrape_origins
   end
 
   def scrape_origins
-    if Time.now - @last_scraped > 18 * 60 * 60
-      @scraping_date = Time.now
-      @origins.each {|o| scrape o }
+    if @last_scraped.nil? || Time.now - @last_scraped > 18 * 60 * 60
+      t = Time.now
+      @origins.each {|o| scrape o, t }
+      @last_scraped = t
     else
       puts "Retrieving last scraping results from database."
     end
   end
 
-  def print_html_summary
-    puts ERB.new(File.read($SUMMARY_TEMPLATE_FILE), nil, '>').result(binding)
+  def get_html_summary
+    ERB.new(File.read($SUMMARY_TEMPLATE_FILE), nil, '>').result(binding)
+  end
+
+  def mail_summary(email)
+    sum = get_html_summary
+    puts sum
+    return
+
+    mail = Mail.deliver do
+      delivery_method :sendmail
+
+      to      "#{email}" 
+      from    'Fluguebersicht <123morph@gmail.com>'
+      subject "Suche vom #{@last_scrape}"
+
+      text_part do
+        body 'This is plain text'
+      end
+
+      html_part do
+        content_type 'text/html; charset=UTF-8'
+        body sum 
+      end
+    end
   end
 
   private
 
-  def scrape(origin)
+  def scrape(origin, time)
     url = "http://www.kayak.de/flights/#{origin}-FUE/2015-07-20/2015-08-01/NONSTOP"
     print "Scraping #{url}... "
 
@@ -57,46 +86,66 @@ class Skyscraper
 
     # customize some data
     flights.each do |f|
-      f[:scraped_at] = @scraping_date
+      f[:scraped_at] = time
       f[:scraped_url] = url
       f[:outbound_date] = url.split('/')[5]
       f[:return_date] = url.split('/')[6]
       f[:price] = f[:price].to_i.to_s
 
-
       # add flight to db
       Price.create f
     end
 
-    puts "Done."
+    @summary[origin][:this] = Price.where(origin: origin).minimum(:price)
 
-    @flights[origin] = flights
+    unless @summary[origin][:alltime].nil?
+      if @summary[origin][:this] < @summary[origin][:alltime]
+        @summary[origin][:tips].push "Neuer Tiefpreis fuer Flughafen #{o}!"
+      end
+    end
+
+    puts "Done."
   end
 
-end
-
-class FlightSummary
-  def self.mail_summary(email)
-    mail = Mail.deliver do
-      delivery_method :sendmail
-
-      to      "#{email}" 
-      from    'Fluguebersicht <123morph@gmail.com>'
-      subject 'First multipart email sent with Mail'
-
-      text_part do
-        body 'This is plain text'
-      end
-
-      html_part do
-        content_type 'text/html; charset=UTF-8'
-        body '<h1>This is HTML</h1>'
-      end
+  def create_summary
+    # calculates historic price minima
+    @origins.each do |o|
+      @summary[o] = Hash.new
+      @summary[o][:last] = Price.where(origin: o, scraped_at: @last_scraped).minimum(:price)
+      @summary[o][:oneweek] = Price.where(origin: o, scraped_at: 1.week.ago..Time.now).minimum(:price)
+      @summary[o][:alltime] = Price.where(origin: o).minimum(:price)
+      @summary[o][:tips] = Array.new
     end
   end
 
-  def self.make_table
-    puts "Results of last scraping"
+  def create_last_flights
+    # generates an array of strings, 1 string for every round trip ticket
+
+    flights=Hash.new
+
+    @origins.each do |o|
+      flights[o]=Array.new
+
+      Price.where(origin: o, scraped_at: @last_scraped).find_each do |p|
+        flights[o].push(
+          format "%s € | %s->%s %s->%s (%s) | %s->%s %s->%s (%s) | %s",
+          p.price,
+          p.origin,
+          p.destination,
+          p.outbound_dep_time.strftime('%R'),
+          p.outbound_arr_time.strftime('%R'),
+          p.outbound_stops,
+          p.destination,
+          p.origin,
+          p.return_dep_time.strftime('%R'),
+          p.return_arr_time.strftime('%R'),
+          p.return_stops,
+          p.airline
+        )
+      end
+    end
+
+    flights
   end
 end
 

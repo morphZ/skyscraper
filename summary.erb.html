@@ -1,6 +1,6 @@
 <table>
   <th>
-    <td></td>
+    <td>Abflughafen</td>
     <% @origins.each do |o| %>
     <td><%= o %></td>
     <% end %>
@@ -8,7 +8,19 @@
   <tr>
     <td>Aktueller Preis</td>
     <% @origins.each do |o| %>
-    <td><%= Price.where(origin: o, scraped_at: @last_scraped).minimum(:price) %></td>
+    <td><%= @summary[o][:last] %></td>
+    <% end %>
+  </tr>
+  <tr>
+    <td>Niedriegster Preis innerhalb der letzten sieben Tage</td>
+    <% @origins.each do |o| %>
+    <td><%= @summary[o][:oneweek] %></td>
+    <% end %>
+  </tr>
+  <tr>
+    <td>Niedriegster Preis bisher</td>
+    <% @origins.each do |o| %>
+    <td><%= @summary[o][:alltime] %></td>
     <% end %>
   </tr>
 </table>
