@@ -6,35 +6,13 @@
 require 'json'
 require 'sqlite3'
 require 'pry'
-require 'active_record'
 require 'mail'
 require 'erb'
 
+require_relative 'price.rb'
+
 $FLIGHT_DATA_FILE = 'flights.json.tmp'
 $SUMMARY_TEMPLATE_FILE ='summary.erb.html'
-
-ActiveRecord::Base.establish_connection(
-  adapter:  'sqlite3',
-  database: 'skyscraper.db'
-)
-
-class Price < ActiveRecord::Base
-  def to_s
-    format "%s € | %s->%s %s->%s (%s) | %s->%s %s->%s (%s) | %s",
-      price,
-      origin,
-      destination,
-      outbound_dep_time.strftime('%R'),
-      outbound_arr_time.strftime('%R'),
-      outbound_stops,
-      destination,
-      origin,
-      return_dep_time.strftime('%R'),
-      return_arr_time.strftime('%R'),
-      return_stops,
-      airline
-  end
-end
 
 class Skyscraper 
   def initialize(origins)
@@ -115,7 +93,7 @@ class Skyscraper
 
     unless @summary[origin][:alltime].nil?
       if @summary[origin][:this] < @summary[origin][:alltime]
-        @summary[origin][:tips].push "Neuer Tiefpreis fuer Flughafen #{o}!"
+        @summary[origin][:tips].push "Neuer Tiefpreis fuer Flughafen #{origin}!"
       end
     end
 
