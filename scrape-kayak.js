@@ -41,7 +41,7 @@ page.open(url, function(status) {
         //console.log(JSON.stringify(strResultsPJS));
         phantom.exit();
 
-      }, 10000);
+      }, 30000);
     });
   }
 });
