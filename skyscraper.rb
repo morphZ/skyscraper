@@ -84,6 +84,7 @@ class Skyscraper
       f[:outbound_date] = url.split('/')[5]
       f[:return_date] = url.split('/')[6]
       f[:price] = f[:price].to_i.to_s
+      f[:airline].gsub!(/\P{ASCII}/, '')
 
       # add flight to db
       Price.create f
