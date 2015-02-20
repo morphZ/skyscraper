@@ -120,21 +120,7 @@ class Skyscraper
       flights[o]=Array.new
 
       Price.where(origin: o, scraped_at: @last_scraped).find_each do |p|
-        flights[o].push(
-          format "%s € | %s->%s %s->%s (%s) | %s->%s %s->%s (%s) | %s",
-          p.price,
-          p.origin,
-          p.destination,
-          p.outbound_dep_time.strftime('%R'),
-          p.outbound_arr_time.strftime('%R'),
-          p.outbound_stops,
-          p.destination,
-          p.origin,
-          p.return_dep_time.strftime('%R'),
-          p.return_arr_time.strftime('%R'),
-          p.return_stops,
-          p.airline
-        )
+        flights[o].push p.to_s
       end
     end
 
