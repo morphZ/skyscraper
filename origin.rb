@@ -18,7 +18,18 @@ class Origin
     else
       puts "Retrieving last results for #{@origin} from database."
     end
+
+    calc_stats
   end
+
+  def last_results
+    s = Array.new
+    Price.where(origin: @origin, scraped_at: @last_scraped_at).each do |o|
+      s.push(o.to_s)
+    end
+  end
+
+  private
 
   def scrape
     url = "http://www.kayak.de/flights/#{@origin}-FUE/2015-07-20/2015-08-01/NONSTOP"
@@ -50,9 +61,17 @@ class Origin
 
     puts 'Done.'
   end
+
+  def calc_stats
+    @stats = {
+      last: Price.where(origin:@origin, scraped_at: @last_scraped_at).minimum(:price),
+      lastweek: Price.where(origin:@origin, scraped_at: 1.week.ago..Time.now).minimum(:price)
+    }
+  end
 end
 
 ["DUS","CGN","FRA"].each do |o|
-  Origin.new o
+  orig = Origin.new o
+  puts orig.last_results
 end
 
