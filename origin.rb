@@ -8,7 +8,7 @@ require_relative 'price'
 $FLIGHT_DATA_FILE = 'flights.json.tmp'
 
 class Origin
-  attr_reader :stats
+  attr_reader :stats, :origin
 
   def initialize (origin)
     @origin = origin
@@ -75,10 +75,3 @@ class Origin
     }
   end
 end
-
-["DUS","CGN","FRA"].each do |o|
-  orig = Origin.new o
-  puts orig.last_results
-  puts orig.stats
-end
-

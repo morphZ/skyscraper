@@ -1,26 +1,42 @@
+<h1>Flugsuche vom <%= Time.now.strftime("%d.%m.%Y um %H:%M Uhr") %></h1>
+<% @origins.each do |k,v| %>
+<h2>Ergebnisse für Flughafen <%= k %>:</h2>
+<ul>
+  <% v.last_results.each do |r| %>
+    <li><%= r %> 
+  <% end %>
+</ul>
+<% end %>
+
+<h2>Zusammenfassung der letzten Suchen</h2>
 <table>
   <th>
-    <td>Abflughafen</td>
-    <% @origins.each do |o| %>
+    <% @origins.keys.each do |o| %>
     <td><%= o %></td>
     <% end %>
   </th>
   <tr>
     <td>Aktueller Preis</td>
-    <% @origins.each do |o| %>
-    <td><%= @summary[o][:last] %></td>
+    <% @origins.values.each do |o| %>
+    <td><%= o.stats[:last] %></td>
+    <% end %>
+  </tr>
+  <tr>
+    <td>Letzter Preis</td>
+    <% @origins.values.each do |o| %>
+    <td><%= o.stats[:before] %></td>
     <% end %>
   </tr>
   <tr>
     <td>Niedriegster Preis innerhalb der letzten sieben Tage</td>
-    <% @origins.each do |o| %>
-    <td><%= @summary[o][:oneweek] %></td>
+    <% @origins.values.each do |o| %>
+    <td><%= o.stats[:lastweek] %></td>
     <% end %>
   </tr>
   <tr>
     <td>Niedriegster Preis bisher</td>
-    <% @origins.each do |o| %>
-    <td><%= @summary[o][:alltime] %></td>
+    <% @origins.values.each do |o| %>
+    <td><%= o.stats[:alltime] %></td>
     <% end %>
   </tr>
 </table>
