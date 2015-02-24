@@ -8,6 +8,8 @@ require_relative 'price'
 $FLIGHT_DATA_FILE = 'flights.json.tmp'
 
 class Origin
+  attr_reader :stats
+
   def initialize (origin)
     @origin = origin
     @last_scraped_at = Price.where(origin: @origin).maximum(:scraped_at)
@@ -63,9 +65,13 @@ class Origin
   end
 
   def calc_stats
+    before_last, before_last_price = Price.where(origin: @origin).order(scraped_at: :desc).group(:scraped_at).limit(2).minimum(:price).to_a[1]
+ 
     @stats = {
       last: Price.where(origin:@origin, scraped_at: @last_scraped_at).minimum(:price),
-      lastweek: Price.where(origin:@origin, scraped_at: 1.week.ago..Time.now).minimum(:price)
+      before: before_last_price,
+      lastweek: Price.where(origin:@origin, scraped_at: (before_last - 1.week)..before_last).minimum(:price),
+      alltime: Price.where(origin: @origin).minimum(:price)
     }
   end
 end
@@ -73,5 +79,6 @@ end
 ["DUS","CGN","FRA"].each do |o|
   orig = Origin.new o
   puts orig.last_results
+  puts orig.stats
 end
 
