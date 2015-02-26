@@ -11,7 +11,7 @@ require 'erb'
 
 require_relative 'origin'
 
-$SUMMARY_TEMPLATE_FILE ='summary.erb.html'
+$SUMMARY_TEMPLATE_FILE ='summary.html.erb'
 
 class Skyscraper 
   def initialize(origins)
