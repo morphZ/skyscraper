@@ -3,10 +3,10 @@
 
 # Scrape the flight search web site Kayak for specific flights, save them to a sqlite db and mail the results to a specific mail adress
 
-require 'json'
-require 'sqlite3'
-require 'pry'
-require 'mail'
+require 'rubygems'
+require 'bundler/setup'
+Bundler.require(:default)
+
 require 'erb'
 
 require_relative 'origin'
