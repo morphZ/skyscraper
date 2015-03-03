@@ -44,7 +44,7 @@ class Skyscraper
 
       to      "#{email}" 
       from    'Fluguebersicht <123morph@gmail.com>'
-      subject "Suche vom #{Time.now.strftime('%d.%m.%Y um %H:%M Uhr')}"
+      subject "Flugsuche vom #{Time.now.strftime('%d.%m.%Y um %H:%M Uhr')}"
 
       text_part do
         content_type 'text/plain; charset=UTF-8'
