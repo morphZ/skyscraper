@@ -25,8 +25,20 @@ class Skyscraper
     ERB.new(File.read($SUMMARY_TEMPLATE_FILE), nil, '>').result(binding)
   end
 
+  def text_summary
+    sum = String.new 
+    @origins.values.each do |o|
+      sum << "Ergebnisse für #{o.origin}\n"
+      sum << "URL: #{o.url}\n"
+      sum << o.last_results.join("\n") << "\n\n" 
+    end
+    sum
+  end
+
   def mail_summary(email)
     sum = html_summary
+    sum_text = text_summary
+
     mail = Mail.deliver do
       delivery_method :sendmail
 
@@ -35,7 +47,8 @@ class Skyscraper
       subject "Suche vom #{Time.now.strftime('%d.%m.%Y um %H:%M Uhr')}"
 
       text_part do
-        body 'This is plain text'
+        content_type 'text/plain; charset=UTF-8'
+        body sum_text 
       end
 
       html_part do

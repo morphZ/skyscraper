@@ -1,42 +1,48 @@
-<h1>Flugsuche vom <%= Time.now.strftime("%d.%m.%Y um %H:%M Uhr") %></h1>
+<h1 style="font-size: 150%">Flugsuche vom <%= Time.now.strftime("%d.%m.%Y um %H:%M Uhr") %></h1>
+
+<h2 style="font-size: 120%">Zusammenfassung</h2>
+<table style="border: 1px solid black; border-collapse: collapse">
+  <th style="border: 1px solid black">
+    <% @origins.keys.each do |o| %>
+    <td style="border: 1px solid black"><%= o %></td>
+    <% end %>
+  </th>
+  <tr style="border: 1px solid black">
+    <td style="border: 1px solid black">Aktueller Preis</td>
+    <% @origins.values.each do |o|
+      delta = o.stats[:last].to_i - o.stats[:before].to_i
+      style = delta < 0 ? ' style="font-weight: bold; color: green;"' : ''
+      delta = '+' + delta if delta > 0
+      delta = '==' if delta == 0
+    %>
+  <td<%= style %> style="border: 1px solid black"><%= o.stats[:last] %><br><%= "(#{delta})" %></td>
+    <% end %>
+  </tr>
+  <tr style="border: 1px solid black">
+    <td style="border: 1px solid black">Letzter Preis</td>
+    <% @origins.values.each do |o| %>
+    <td style="border: 1px solid black"><%= o.stats[:before] %></td>
+    <% end %>
+  </tr>
+  <tr style="border: 1px solid black">
+    <td style="border: 1px solid black">Niedriegster Preis innerhalb der letzten sieben Tage</td>
+    <% @origins.values.each do |o| %>
+    <td style="border: 1px solid black"><%= o.stats[:lastweek] %></td>
+    <% end %>
+  </tr>
+  <tr style="border: 1px solid black">
+    <td style="border: 1px solid black">Niedriegster Preis bisher</td>
+    <% @origins.values.each do |o| %>
+    <td style="border: 1px solid black"><%= o.stats[:alltime] %></td>
+    <% end %>
+  </tr>
+</table>
+
 <% @origins.each do |k,v| %>
-<h2>Ergebnisse für Flughafen <%= k %>:</h2>
+<h2 style="font-size: 120%">Aktuelle Ergebnisse für <%= k %></h2>
 <ul>
   <% v.last_results.each do |r| %>
     <li><%= r %> 
   <% end %>
 </ul>
 <% end %>
-
-<h2>Zusammenfassung der letzten Suchen</h2>
-<table>
-  <th>
-    <% @origins.keys.each do |o| %>
-    <td><%= o %></td>
-    <% end %>
-  </th>
-  <tr>
-    <td>Aktueller Preis</td>
-    <% @origins.values.each do |o| %>
-    <td><%= o.stats[:last] %></td>
-    <% end %>
-  </tr>
-  <tr>
-    <td>Letzter Preis</td>
-    <% @origins.values.each do |o| %>
-    <td><%= o.stats[:before] %></td>
-    <% end %>
-  </tr>
-  <tr>
-    <td>Niedriegster Preis innerhalb der letzten sieben Tage</td>
-    <% @origins.values.each do |o| %>
-    <td><%= o.stats[:lastweek] %></td>
-    <% end %>
-  </tr>
-  <tr>
-    <td>Niedriegster Preis bisher</td>
-    <% @origins.values.each do |o| %>
-    <td><%= o.stats[:alltime] %></td>
-    <% end %>
-  </tr>
-</table>
