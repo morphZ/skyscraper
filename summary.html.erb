@@ -10,7 +10,7 @@
     <% @origins.values.each do |o|
       delta = o.stats[:last].to_i - o.stats[:before].to_i
       style = delta < 0 ? ' style="font-weight: bold; color: green;"' : ''
-      delta = '+' + delta if delta > 0
+      delta = '+' + delta.to_s if delta > 0
       delta = '==' if delta == 0
     %>
   <td<%= style %> style="border: 1px solid black"><%= o.stats[:last] %><br><%= "(#{delta})" %></td>
