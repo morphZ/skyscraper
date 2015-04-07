@@ -65,13 +65,13 @@ class Origin
   end
 
   def calc_stats
-    before_last, before_last_price = Price.where(origin: @origin).order(scraped_at: :desc).group(:scraped_at).limit(2).minimum(:price).to_a[1]
+    before_last, before_last_price = Price.where(origin: @origin, outbound_stops: 'Nonstop', return_stops: 'Nonstop').order(scraped_at: :desc).group(:scraped_at).limit(2).minimum(:price).to_a[1]
  
     @stats = {
-      last: Price.where(origin:@origin, scraped_at: @last_scraped_at).minimum(:price),
+      last: Price.where(origin:@origin, scraped_at: @last_scraped_at, outbound_stops: 'Nonstop', return_stops: 'Nonstop').minimum(:price),
       before: before_last_price,
-      lastweek: Price.where(origin:@origin, scraped_at: (before_last - 1.week)..before_last).minimum(:price),
-      alltime: Price.where(origin: @origin).minimum(:price)
+      lastweek: Price.where(origin:@origin, scraped_at: (before_last - 1.week)..before_last, outbound_stops: 'Nonstop', return_stops: 'Nonstop').minimum(:price),
+      alltime: Price.where(origin: @origin, outbound_stops: 'Nonstop', return_stops: 'Nonstop').minimum(:price)
     }
   end
 end

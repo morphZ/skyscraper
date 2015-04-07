@@ -61,3 +61,4 @@ end
 
 s = Skyscraper.new [:DUS, :CGN, :FRA]
 s.mail_summary 'franz.kirchhoff@googlemail.com'
+s.mail_summary 'u.b.lelgemann@googlemail.com'
