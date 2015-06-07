@@ -42,7 +42,7 @@ class Origin
     `./phantomjs scrape-kayak.js "#{@url}"`
 
     # parse flight data from json file
-    flights = JSON.parse File.read($FLIGHT_DATA_FILE), :symbolize_names => true
+    flights = JSON.parse File.read($FLIGHT_DATA_FILE, :encoding => 'utf-8'), :symbolize_names => true
 
     # delete temp file
     File.delete($FLIGHT_DATA_FILE);

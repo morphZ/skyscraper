@@ -1,0 +1,2 @@
+cd ~/skyscraper
+./skyscraper.rb
